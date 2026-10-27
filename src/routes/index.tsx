@@ -96,7 +96,7 @@ function Index() {
               <circle cx="60" cy="60" r="14" fill="#e0352b" /><circle cx="100" cy="60" r="15" fill="#6f8296" />
               <circle cx="145" cy="60" r="18" fill="#a5502a" /><circle cx="90" cy="25" r="10" fill="#fff" /><circle cx="85" cy="95" r="10" fill="#fff" />
             </svg>
-            <h3 className="mt-4 flex items-center gap-2 font-semibold"><Box className="h-4 w-4 text-primary" /> 3D mode <span className="rounded-full bg-primary/15 px-2 text-[11px] text-primary">Pro</span></h3>
+            <h3 className="mt-4 flex items-center gap-2 font-semibold"><Box className="h-4 w-4 text-primary" /> 3D mode</h3>
             <p className="mt-1 text-sm text-muted-foreground">Stereochemistry, chiral centres and optical activity — like SN2 backside attack and Walden inversion.</p>
           </Reveal>
           <Reveal delay={0.16} className="rounded-2xl border bg-surface p-5">
@@ -118,7 +118,7 @@ function Index() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <SectionHeading eyebrow="Pricing" title="Free to start. Pro when you're ready." />
+        <SectionHeading eyebrow="Pricing" title="Free for every student. All of it." />
         <PricingCards />
         <ComparisonTable />
       </section>
@@ -127,7 +127,7 @@ function Index() {
         <SectionHeading eyebrow="Roadmap" title="Built by students, for students" />
         <div className="grid gap-4 md:grid-cols-2">
           {[
-            ["Now", ["Landing page", "Reactions tab", "2D, 3D and AI chat end-to-end", "Credits + Free/Pro split"]],
+            ["Now", ["Landing page", "Reactions tab", "2D, 3D and AI chat end-to-end", "Free for everyone — no credits, no locks"]],
             ["Later", ["Ask questions during the voiceover", "Wider course-specific coverage"]],
           ].map(([t, items]) => (
             <Reveal key={t as string} className="rounded-2xl border bg-surface p-6">
@@ -143,8 +143,8 @@ function Index() {
       <section id="waitlist" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16">
         <Reveal className="relative overflow-hidden rounded-3xl border bg-surface p-8 text-center sm:p-12">
           <div className="glow-orb absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2" />
-          <h2 className="relative text-3xl font-bold">Get Pro first.</h2>
-          <p className="relative mt-2 text-muted-foreground">Join the waitlist for 3D mode and voiceovers.</p>
+          <h2 className="relative text-3xl font-bold">Stay in the loop.</h2>
+          <p className="relative mt-2 text-muted-foreground">Be first to hear about new reactions, voiceovers and course packs.</p>
           <form
             className="relative mx-auto mt-6 flex max-w-md flex-col gap-2 sm:flex-row"
             onSubmit={(e) => {
@@ -153,12 +153,12 @@ function Index() {
                 toast.error("Please enter a valid email");
                 return;
               }
-              toast.success("You're on the waitlist!");
+              toast.success("You're on the list — thanks!");
               setEmail("");
             }}
           >
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@university.edu" aria-label="Email" required />
-            <Button type="submit">Join the waitlist</Button>
+            <Button type="submit">Keep me posted</Button>
           </form>
         </Reveal>
       </section>

@@ -1,10 +1,9 @@
 import { ClientOnly, createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { lazy, Suspense, useState } from "react";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getReaction } from "@/data/reactions";
 import { MechanismPlayer2D } from "@/components/mechanisms/MechanismPlayer2D";
 import { TutorChat } from "@/components/mechanisms/TutorChat";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const Molecule3D = lazy(() => import("@/components/mechanisms/Molecule3D"));
@@ -32,7 +31,6 @@ function Detail() {
   const { slug } = Route.useLoaderData();
   const r = getReaction(slug)!;
   const [mode, setMode] = useState<ModeT>("2D");
-  const [preview, setPreview] = useState(false);
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-8">
@@ -66,17 +64,6 @@ function Detail() {
                 <Molecule3D scene={r.scene3d} />
               </Suspense>
             </ClientOnly>
-            {!preview && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-3xl bg-background/75 p-6 text-center backdrop-blur-sm">
-                <Lock className="h-8 w-8 text-primary" />
-                <h2 className="text-2xl font-bold">Pro feature</h2>
-                <p className="max-w-sm text-sm text-muted-foreground">3D mode is part of ReactIQ Pro.</p>
-                <div className="flex gap-2">
-                  <Button asChild><Link to="/pricing">Upgrade to Pro</Link></Button>
-                  <Button variant="secondary" onClick={() => setPreview(true)}>Preview anyway</Button>
-                </div>
-              </div>
-            )}
             <div className="mt-4 rounded-2xl border bg-surface-2 p-4">
               <h3 className="font-semibold">Why 3D matters here</h3>
               <p className="mt-1 text-sm text-muted-foreground">{r.why3d}</p>

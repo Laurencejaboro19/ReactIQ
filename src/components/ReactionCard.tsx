@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
 import type { Reaction } from "@/data/reactions";
 
 export function ReactionCard({ r }: { r: Reaction }) {
@@ -11,11 +10,7 @@ export function ReactionCard({ r }: { r: Reaction }) {
     >
       <div className="flex items-start justify-between gap-2">
         <span className="rounded-full border px-2.5 py-0.5 text-[11px] text-muted-foreground">{r.category}</span>
-        {r.pro && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
-            <Lock className="h-3 w-3" aria-hidden /> Pro
-          </span>
-        )}
+        <span className="text-[11px] text-muted-foreground">{r.steps.length} steps</span>
       </div>
       <h3 className="mt-4 text-lg font-semibold group-hover:text-primary">{r.name}</h3>
       <p className="mt-1 flex-1 text-sm text-muted-foreground">{r.short}</p>

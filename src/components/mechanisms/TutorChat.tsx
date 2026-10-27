@@ -13,7 +13,6 @@ export function TutorChat({ reaction }: { reaction: Reaction }) {
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [credits, setCredits] = useState(18);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,14 +22,9 @@ export function TutorChat({ reaction }: { reaction: Reaction }) {
   const ask = (q: string) => {
     const text = q.trim();
     if (!text || typing) return;
-    if (credits <= 0) {
-      setMsgs((m) => [...m, { role: "tutor", text: "You're out of credits on the Free plan. Join the Pro waitlist for more." }]);
-      return;
-    }
     setMsgs((m) => [...m, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    setCredits((c) => c - 1);
     setTimeout(() => {
       setMsgs((m) => [...m, { role: "tutor", text: tutorAnswer(reaction, text) }]);
       setTyping(false);
@@ -44,7 +38,7 @@ export function TutorChat({ reaction }: { reaction: Reaction }) {
           <Sparkles className="h-4 w-4 text-primary" aria-hidden /> AI tutor
         </div>
         <span className="rounded-full bg-surface-2 px-3 py-1 text-xs text-muted-foreground">
-          Credits: <span className="font-semibold text-foreground">{credits}</span> left · Free plan
+          Free · unlimited questions
         </span>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">

@@ -138,11 +138,13 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
           {Object.entries(atoms).map(([id, a]) =>
             a.hidden ? null : (
               <g key={id} opacity={a.op ?? 1} transform={`translate(${a.x} ${a.y})`}>
-                <text textAnchor="middle" dominantBaseline="central" className="fill-current font-display" fontSize="17" fontWeight={600}>
-                  {a.label}
-                </text>
+                {a.label ? (
+                  <text textAnchor="middle" dominantBaseline="central" className="fill-current font-display" fontSize="17" fontWeight={600}>
+                    {a.label}
+                  </text>
+                ) : null}
                 {a.charge && (
-                  <text x={a.label && a.label.length > 1 ? 16 : 11} y={-11} fontSize="12" fill="var(--primary)" fontWeight={700}>
+                  <text x={a.label && a.label.length > 1 ? 16 : a.label ? 11 : 6} y={a.label ? -11 : -8} fontSize="12" fill="var(--primary)" fontWeight={700}>
                     {a.charge}
                   </text>
                 )}
@@ -231,8 +233,9 @@ function shorten(a: P, b: P) {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   const len = Math.hypot(dx, dy) || 1;
-  const ra = (a.label?.length ?? 1) > 1 ? 18 : 12;
-  const rb = (b.label?.length ?? 1) > 1 ? 18 : 12;
+  const rad = (l?: string) => (l === "" ? 0 : (l?.length ?? 1) > 1 ? 18 : 12);
+  const ra = rad(a.label);
+  const rb = rad(b.label);
   return {
     x1: a.x + (dx / len) * ra,
     y1: a.y + (dy / len) * ra,
@@ -255,8 +258,16 @@ function BondShape({ a, b, style, opacity }: { a: P; b: P; style: BondStyle; opa
     case "double":
       return (
         <g opacity={opacity}>
-          <line x1={s.x1 + s.nx * 3.5} y1={s.y1 + s.ny * 3.5} x2={s.x2 + s.nx * 3.5} y2={s.y2 + s.ny * 3.5} stroke="currentColor" strokeWidth={2.2} />
-          <line x1={s.x1 - s.nx * 3.5} y1={s.y1 - s.ny * 3.5} x2={s.x2 - s.nx * 3.5} y2={s.y2 - s.ny * 3.5} stroke="currentColor" strokeWidth={2.2} />
+          <line x1={s.x1 + s.nx * 3.5} y1={s.y1 + s.ny * 3.5} x2={s.x2 + s.nx * 3.5} y2={s.y2 + s.ny * 3.5} stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" />
+          <line x1={s.x1 - s.nx * 3.5} y1={s.y1 - s.ny * 3.5} x2={s.x2 - s.nx * 3.5} y2={s.y2 - s.ny * 3.5} stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" />
+        </g>
+      );
+    case "triple":
+      return (
+        <g opacity={opacity}>
+          <line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" />
+          <line x1={s.x1 + s.nx * 5} y1={s.y1 + s.ny * 5} x2={s.x2 + s.nx * 5} y2={s.y2 + s.ny * 5} stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" />
+          <line x1={s.x1 - s.nx * 5} y1={s.y1 - s.ny * 5} x2={s.x2 - s.nx * 5} y2={s.y2 - s.ny * 5} stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" />
         </g>
       );
     case "wedge":

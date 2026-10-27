@@ -1,82 +1,70 @@
 import { Link } from "@tanstack/react-router";
-import { Check, Minus } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/site/Reveal";
 
-export const comparison: [string, string, string][] = [
-  ["2D mode", "Yes, uses credits", "Yes, with more credits"],
-  ["AI chat mode", "Yes, uses credits", "Yes, with more credits"],
-  ["3D mode", "Not available", "Included"],
-  ["Reaction library", "Some mechanisms locked", "Full access"],
-  ["AI model quality", "Standard", "Smarter model"],
-  ["Voiceover on 2D mechanisms", "Not available", "Included"],
+export const included: [string, string][] = [
+  ["2D mode", "Every mechanism, step by step, unlimited"],
+  ["3D mode", "Interactive ball-and-stick animations for every reaction"],
+  ["AI chat mode", "Ask the tutor as many questions as you like"],
+  ["Reaction library", "Full access — nothing locked"],
+  ["Stereochemistry views", "Rotate, zoom and step through transition states"],
+  ["Voiceover on 2D mechanisms", "Coming soon — free when it lands"],
 ];
 
 export function PricingCards() {
-  const scrollToWaitlist = () => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
   return (
-    <div className="grid gap-5 md:grid-cols-2">
-      <Reveal className="rounded-2xl border bg-surface p-6">
-        <h3 className="text-lg font-semibold">Free</h3>
-        <p className="mt-3 font-display text-5xl font-bold">₦0</p>
-        <p className="mt-2 text-sm text-muted-foreground">2D walkthroughs and AI chat on a monthly credit allowance.</p>
-        <Button asChild variant="secondary" className="mt-6 w-full">
-          <Link to="/reactions">Start learning</Link>
-        </Button>
-      </Reveal>
-      <Reveal delay={0.1} className="relative overflow-hidden rounded-2xl border border-primary/60 bg-surface p-6 shadow-glow">
-        <div className="glow-orb absolute -right-16 -top-16 h-56 w-56" />
-        <div className="relative">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Pro</h3>
-            <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">Most popular</span>
-          </div>
-          <p className="mt-3 font-display text-5xl font-bold text-primary">Coming soon</p>
-          <p className="mt-2 text-sm text-muted-foreground">3D mode, voiceovers, a smarter tutor and the full library — with more credits.</p>
-          <Button className="mt-6 w-full" onClick={scrollToWaitlist} asChild>
-            <Link to="/" hash="waitlist">Join the waitlist</Link>
+    <Reveal className="relative overflow-hidden rounded-3xl border border-primary/50 bg-surface p-8 shadow-glow sm:p-10">
+      <div className="glow-orb absolute -right-20 -top-20 h-72 w-72" />
+      <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden /> Free for every student
+          </span>
+          <p className="mt-4 font-display text-6xl font-bold">₦0</p>
+          <p className="mt-2 max-w-md text-muted-foreground">
+            2D, 3D and the AI tutor — all of it, for every reaction, with no credits, no locks and no upgrade button. We're students too.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
+          <Button asChild size="lg">
+            <Link to="/reactions">Start learning</Link>
+          </Button>
+          <Button asChild size="lg" variant="secondary">
+            <Link to="/reactions/$slug" params={{ slug: "sn2" }}>Try the SN2 demo</Link>
           </Button>
         </div>
-      </Reveal>
-    </div>
-  );
-}
-
-function Cell({ v }: { v: string }) {
-  const no = v === "Not available";
-  return (
-    <td className="px-4 py-3 text-sm">
-      <span className={no ? "inline-flex items-center gap-1.5 text-muted-foreground" : "inline-flex items-center gap-1.5"}>
-        {no ? <Minus className="h-4 w-4" aria-hidden /> : <Check className="h-4 w-4 text-primary" aria-hidden />}
-        {v}
-      </span>
-    </td>
+      </div>
+    </Reveal>
   );
 }
 
 export function ComparisonTable() {
   return (
-    <Reveal className="mt-8 overflow-x-auto rounded-2xl border bg-surface">
-      <table className="w-full min-w-[520px] text-left">
-        <caption className="sr-only">Free vs Pro comparison</caption>
+    <Reveal className="mt-8 overflow-hidden rounded-2xl border bg-surface">
+      <table className="w-full text-left">
+        <caption className="sr-only">What's included in ReactIQ</caption>
         <thead>
           <tr className="border-b">
             <th className="px-4 py-3 text-sm font-semibold">Feature</th>
-            <th className="px-4 py-3 text-sm font-semibold">Free</th>
-            <th className="px-4 py-3 text-sm font-semibold text-primary">Pro</th>
+            <th className="px-4 py-3 text-sm font-semibold text-primary">Included</th>
           </tr>
         </thead>
         <tbody>
-          {comparison.map(([f, free, pro]) => (
+          {included.map(([f, v]) => (
             <tr key={f} className="border-b last:border-0">
               <th scope="row" className="px-4 py-3 text-sm font-medium">{f}</th>
-              <Cell v={free} />
-              <Cell v={pro} />
+              <td className="px-4 py-3 text-sm">
+                <span className="inline-flex items-center gap-1.5">
+                  <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  {v}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="border-t px-4 py-3 text-xs text-muted-foreground">Usage is credits-based: each 2D walkthrough and AI chat message uses credits.</p>
+      <p className="border-t px-4 py-3 text-xs text-muted-foreground">No account needed. Open a reaction and start.</p>
     </Reveal>
   );
 }
