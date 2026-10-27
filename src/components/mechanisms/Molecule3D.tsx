@@ -2,7 +2,8 @@ import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { ChevronLeft, ChevronRight, Play, Repeat, Square } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Repeat, Square, ZoomIn, ZoomOut } from "lucide-react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { Element, Scene3D, Vec3 } from "@/data/reactions";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -55,6 +56,15 @@ function webglSupported() {
   } catch {
     return false;
   }
+}
+
+/** Let vertical swipes scroll the page; sideways drags rotate. Runs after OrbitControls mounts. */
+function TouchPolicy() {
+  const { gl } = useThree();
+  useEffect(() => {
+    gl.domElement.style.touchAction = "pan-y";
+  });
+  return null;
 }
 
 function FirstFrame({ onReady }: { onReady: () => void }) {
@@ -271,6 +281,16 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
   const [frame, setFrame] = useState(0);
   const [webgl, setWebgl] = useState<boolean | null>(null);
   const [ready, setReady] = useState(false);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const zoom = (factor: number) => {
+    const c = controlsRef.current;
+    if (!c) return;
+    const cam = c.object;
+    const dir = cam.position.clone().sub(c.target);
+    const len = Math.min(c.maxDistance, Math.max(c.minDistance, dir.length() * factor));
+    cam.position.copy(c.target).add(dir.setLength(len));
+    c.update();
+  };
   const max = scene.frameLabels.length - 1;
   const bounds = useMemo(() => sceneBounds(scene), [scene]);
   const legend = useMemo(() => Array.from(new Set(scene.atoms.map((a) => (a.el === "Cc" ? "C" : a.el)))) as Element[], [scene]);
@@ -337,7 +357,8 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
                 spin={spin}
                 onEnd={() => setMode("paused")}
               />
-              <OrbitControls enablePan={false} minDistance={3} maxDistance={Math.max(16, bounds.radius * 5)} />
+              <OrbitControls ref={controlsRef} enablePan={false} enableZoom={false} minDistance={3} maxDistance={Math.max(16, bounds.radius * 5)} />
+              <TouchPolicy />
             </Canvas>
           </CanvasBoundary>
         )}
@@ -352,7 +373,15 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
         <div className="pointer-events-none absolute left-3 top-3 max-w-[80%] rounded-full bg-background/85 px-3 py-1 text-xs font-medium text-foreground">
           {label} · frame {Math.round(frame) + 1}/{max + 1}
         </div>
-        <p className="pointer-events-none absolute bottom-2 right-3 text-[11px] text-stage-foreground/60">Drag to rotate · pinch to zoom</p>
+        <div className="absolute bottom-2 right-2 flex gap-1">
+          <button type="button" onClick={() => zoom(0.8)} aria-label="Zoom in" className="rounded-full bg-background/85 p-2 text-foreground shadow hover:bg-background">
+            <ZoomIn className="h-4 w-4" />
+          </button>
+          <button type="button" onClick={() => zoom(1.25)} aria-label="Zoom out" className="rounded-full bg-background/85 p-2 text-foreground shadow hover:bg-background">
+            <ZoomOut className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="pointer-events-none absolute bottom-3 left-3 text-[11px] text-stage-foreground/60">Drag sideways to rotate</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
