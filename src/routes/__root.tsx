@@ -84,7 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Learn reaction mechanisms in 2D, 3D and with an AI tutor." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:site_name", content: "ReactIQ" },
+      { name: "theme-color", content: "#111214" },
     ],
     links: [
       {
