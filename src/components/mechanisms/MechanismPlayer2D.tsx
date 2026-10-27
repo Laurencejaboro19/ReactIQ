@@ -165,7 +165,7 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
                 strokeDasharray={1}
                 strokeDashoffset={1 - drawT}
                 markerEnd={drawT > 0.9 ? "url(#arrowhead)" : undefined}
-                opacity={1 - 0.75 * moveT}
+                opacity={1 - moveT}
                 style={{ filter: "drop-shadow(0 0 4px color-mix(in oklab, var(--primary) 60%, transparent))" }}
               />
             ))}

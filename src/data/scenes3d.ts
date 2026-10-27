@@ -490,7 +490,7 @@ function ozonolysis(): Scene3D {
       H1a: at(C1, [-0.5, 0.866, 0], CH), H1b: at(C1, [-0.5, -0.866, 0], CH),
       H2a: at(C2, [0.5, 0.866, 0], CH), H2b: at(C2, [0.5, -0.866, 0], CH),
       Oa: [-1.09, 0, 3.1], Ob: [0, 0, 3.75], Oc: [1.09, 0, 3.1],
-      ...dms([4.6, 0, -2.4], [0, 0, 0]),
+      ...dms([4.3, 0, -1.4], [0, 0, 0]),
     };
   };
   const f1 = (): Frame => {
@@ -502,7 +502,7 @@ function ozonolysis(): Scene3D {
     const [b1, b2] = sp3pair(C2, C1, Oc);
     return {
       C1, C2, H1a: at(C1, a1, CH), H1b: at(C1, a2, CH), H2a: at(C2, b1, CH), H2b: at(C2, b2, CH),
-      Oa, Ob: [0, 0, 2.15], Oc, ...dms([4.6, 0, -2.4], [0, 0, 0]),
+      Oa, Ob: [0, 0, 2.15], Oc, ...dms([4.3, 0, -1.4], [0, 0, 0]),
     };
   };
   const f2 = (): Frame => {
@@ -515,7 +515,7 @@ function ozonolysis(): Scene3D {
       C1, C2,
       H1a: at(C1, [0, 0.866, -0.5], CH), H1b: at(C1, [0, -0.866, -0.5], CH),
       H2a: at(C2, [0, 0.866, -0.5], CH), H2b: at(C2, [0, -0.866, -0.5], CH),
-      Oa, Ob, Oc, ...dms([4.8, 0, -2.6], [0, 0, 0]),
+      Oa, Ob, Oc, ...dms([4.5, 0, -1.6], [0, 0, 0]),
     };
   };
   const f3 = (): Frame => {
@@ -535,7 +535,7 @@ function ozonolysis(): Scene3D {
     const Oc = at(C2, [0.5, 0, 0.866], COd);
     const [a1, a2] = sp2pair(C1, Oa, planeWith(sub(Oa, C1), [0, 1, 0]));
     const [b1, b2] = sp2pair(C2, Oc, planeWith(sub(Oc, C2), [0, 1, 0]));
-    const Ob: V = [-0.6, 0, 2.9];
+    const Ob: V = [-0.6, 0, 2.4];
     const S = at(Ob, [0.35, 0, 1], SO);
     return { C1, C2, H1a: at(C1, a1, CH), H1b: at(C1, a2, CH), H2a: at(C2, b1, CH), H2b: at(C2, b2, CH), Oa, Ob, Oc, ...dms(S, Ob) };
   };
@@ -686,7 +686,7 @@ function fischer(): Scene3D {
   };
   return build(
     els,
-    [planar(false, 2.4, [0.3, 0, 3.7]), planar(true, 0, [0.2, 0, 2.8]), tetra(false), tetra(true), leave(false), leave(true)],
+    [planar(false, 2.2, [0.3, 0, 3.3]), planar(true, 0, [0.2, 0, 2.7]), tetra(false), tetra(true), leave(false), leave(true)],
     [
       ["C", "Cm", same(6, 1)],
       ["C", "O1", [2, 2, 1, 1, 2, 2]],
@@ -754,7 +754,7 @@ function claisen(): Scene3D {
     const Ca: V = [-CC, 0, 0];
     const [c3d, h2d, h3d] = trio(X, -1 / 3, 270);
     const C3 = at(Ca, c3d, deprotonated ? 1.42 : CC);
-    const [p1, p2] = sp2pair(C3, Ca, [0, 1, 0]);
+    const [p1, p2] = sp2pair(C3, Ca, [0, 0, 1]);
     const O3 = at(C3, p1, COd);
     const Cb = at(C3, p2, 1.5);
     const Ha2start = at(Ca, h2d, CH);
@@ -884,7 +884,7 @@ function friedelCrafts(): Scene3D {
     return { ...ring(), Cac, Oac, Mac, Cl1, ...alcl(Al, Cl1, true) };
   };
   const f1 = (): Frame => {
-    const Cac: V = [1.5, 0.3, 3.0];
+    const Cac: V = [1.5, 0.3, 2.5];
     const d: V = norm([0.3, 0.95, 0]);
     const Oac = at(Cac, d, 1.12);
     const Mac = at(Cac, mul(d, -1), 1.45);
@@ -911,8 +911,8 @@ function friedelCrafts(): Scene3D {
     const Cac = at(R1, [1, 0, 0], 1.5);
     const Oac = at(Cac, [0.5, 0.866, 0], COd);
     const Mac = at(Cac, [0.5, -0.866, 0], 1.5);
-    const Al: V = [5.8, -2.8, -4.0];
-    const Cl1: V = [3.6, -1.3, -2.7];
+    const Al: V = [4.8, -1.7, -2.8];
+    const Cl1: V = [3.3, -0.9, -2.2];
     const H1 = at(Cl1, [-0.45, 0.4, 0.8], 1.28);
     return { ...r, H1, Cac, Oac, Mac, Cl1, ...alcl(Al, Cl1, true) };
   };

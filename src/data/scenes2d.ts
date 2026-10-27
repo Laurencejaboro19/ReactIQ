@@ -183,7 +183,7 @@ export const ozonolysisScene: Scene2D = {
     { id: "Oa", frames: [f(158, 60, "O", "−"), f(160, 84, "O"), f(112, 86, "O"), f(200, 182, "O"), f(100, 86, "O")] },
     { id: "Ob", frames: [f(200, 36, "O", "+"), f(200, 58, "O"), f(316, 70, "O", "−"), f(170, 82, "O"), f(336, 72, "O")] },
     { id: "Oc", frames: [f(242, 60, "O"), f(240, 84, "O"), f(272, 86, "O", "+"), f(230, 82, "O"), f(300, 86, "O")] },
-    { id: "S", frames: [f(340, 210, "Me₂S"), f(340, 210, "Me₂S"), f(340, 210, "Me₂S"), f(216, 60, "Me₂S"), f(336, 30, "Me₂S")] },
+    { id: "S", frames: [f(340, 210, "Me₂S"), f(340, 210, "Me₂S"), f(340, 210, "Me₂S"), f(200, 28, "Me₂S"), f(336, 30, "Me₂S")] },
   ],
   bonds: [
     { a: "C1", b: "C2", frames: ["double", "single", "none", "none", "none"] },
@@ -207,7 +207,7 @@ export const ozonolysisScene: Scene2D = {
     { step: 2, d: "M 300 60 Q 240 24 180 120" },
     { step: 2, d: "M 124 112 Q 130 124 160 132" },
     { step: 2, d: "M 270 112 Q 262 128 250 134" },
-    { step: 3, d: "M 232 72 Q 210 60 194 78" },
+    { step: 3, d: "M 190 42 Q 176 58 176 70" },
     { step: 3, d: "M 184 96 Q 170 110 166 128" },
     { step: 3, d: "M 206 166 Q 190 160 182 148" },
     { step: 3, d: "M 234 158 Q 236 140 236 128" },
@@ -257,7 +257,7 @@ export const fischerScene: Scene2D = {
   bonds: [
     { a: "Me", b: "C", frames: rep(4, "single") },
     { a: "C", b: "Ot", frames: ["double", "double", "single", "double"] },
-    { a: "Ot", b: "Hc", frames: ["none", "single", "single", "none"] },
+    { a: "Ot", b: "Hc", frames: ["none", "single", "none", "none"] },
     { a: "C", b: "Oh", frames: ["single", "single", "wedge", "none"] },
     { a: "C", b: "Om", frames: ["none", "none", "dash", "single"] },
     { a: "Om", b: "Hm", frames: ["single", "single", "single", "none"] },
