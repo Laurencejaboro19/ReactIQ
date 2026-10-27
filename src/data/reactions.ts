@@ -452,17 +452,3 @@ export const reactions: Reaction[] = [
 export function getReaction(slug: string) {
   return reactions.find((r) => r.slug === slug);
 }
-
-export function tutorAnswer(reaction: Reaction, question: string): string {
-  const q = question.toLowerCase();
-  if (/one sentence|explain|summar|overview/.test(q)) return `${reaction.name}: ${reaction.summary}`;
-  for (const entry of [...reaction.chat, ...generalKnowledge]) {
-    if (entry.keywords.some((k) => q.includes(k))) return entry.answer;
-  }
-  const step = reaction.steps.find((s) => q.includes(s.title.toLowerCase().split(" ")[0] ?? ""));
-  if (step) return `${step.title}: ${step.text}`;
-  if (/step|first|then|next|last|mechanism/.test(q)) {
-    return reaction.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.text}`).join("\n\n");
-  }
-  return `Good question! I don't have a specific note on that yet. Here's the core idea of the ${reaction.name}: ${reaction.summary} Try asking about a specific step, the leaving group, the nucleophile, or stereochemistry — or switch to 2D/3D mode to watch it happen.`;
-}

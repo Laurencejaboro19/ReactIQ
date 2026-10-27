@@ -156,3 +156,23 @@
 @utility animate-dash {
   animation: dash-flow 1.4s linear infinite;
 }
+
+/* Content is visible by default; the animation only adds a gentle entrance. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal {
+  animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+  }
+}

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { ChevronLeft, ChevronRight, Play, Repeat, Square } from "lucide-react";
 import type { Element, Scene3D, Vec3 } from "@/data/reactions";
@@ -28,6 +28,45 @@ export const ELEMENT_INFO: Record<Element, { color: string; name: string; r: num
 };
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
+
+class CanvasBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
+  override state = { error: null as string | null };
+  static getDerivedStateFromError(e: unknown) {
+    return { error: e instanceof Error ? e.message : String(e) };
+  }
+  override render() {
+    if (this.state.error) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-stage-foreground">
+          <p className="font-semibold">The 3D viewer could not start on this device.</p>
+          <p className="max-w-sm text-sm opacity-80">Try a recent version of Chrome, Safari or Firefox with hardware acceleration on. The 2D mode shows the same mechanism step by step.</p>
+          <p className="text-[11px] opacity-50">{this.state.error}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function webglSupported() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl") || c.getContext("experimental-webgl"));
+  } catch {
+    return false;
+  }
+}
+
+function FirstFrame({ onReady }: { onReady: () => void }) {
+  const done = useRef(false);
+  useFrame(() => {
+    if (!done.current) {
+      done.current = true;
+      onReady();
+    }
+  });
+  return null;
+}
 const UP = new THREE.Vector3(0, 1, 0);
 
 function sample(frames: number[] | Vec3[], time: number) {
@@ -230,6 +269,8 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
   const [spin, setSpin] = useState(false);
   const [style, setStyle] = useState<Style>("ball");
   const [frame, setFrame] = useState(0);
+  const [webgl, setWebgl] = useState<boolean | null>(null);
+  const [ready, setReady] = useState(false);
   const max = scene.frameLabels.length - 1;
   const bounds = useMemo(() => sceneBounds(scene), [scene]);
   const legend = useMemo(() => Array.from(new Set(scene.atoms.map((a) => (a.el === "Cc" ? "C" : a.el)))) as Element[], [scene]);
@@ -242,7 +283,11 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
     speedRef.current = speed;
   }, [speed]);
   useEffect(() => {
+    setWebgl(webglSupported());
+  }, []);
+  useEffect(() => {
     timeRef.current = 0;
+    setReady(false);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setMode("paused");
     const id = setInterval(() => setFrame(timeRef.current), 120);
     return () => clearInterval(id);
@@ -260,28 +305,50 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
   return (
     <div className="space-y-3">
       <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border bg-stage sm:aspect-[16/9]">
-        <Canvas camera={{ position: [0, 2.2, 8.5], fov: FOV }} dpr={[1, 2]} shadows>
-          <color attach="background" args={["#efede8"]} />
-          <CameraRig half={bounds.half} />
-          <ambientLight intensity={0.55} />
-          <directionalLight position={[5, 8, 6]} intensity={1.6} />
-          <directionalLight position={[-6, -2, -4]} intensity={0.4} />
-          <Environment resolution={64}>
-            <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
-            <Lightformer intensity={1} position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
-          </Environment>
-          <Molecule
-            scene={scene}
-            center={bounds.center}
-            timeRef={timeRef}
-            modeRef={modeRef}
-            speedRef={speedRef}
-            style={style}
-            spin={spin}
-            onEnd={() => setMode("paused")}
-          />
-          <OrbitControls enablePan={false} minDistance={3} maxDistance={Math.max(16, bounds.radius * 5)} />
-        </Canvas>
+        {webgl === false ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-stage-foreground">
+            <p className="font-semibold">This browser has WebGL turned off, so the 3D viewer can't run.</p>
+            <p className="max-w-sm text-sm opacity-80">Open the page in Chrome, Safari or Firefox (not an in-app browser) and make sure hardware acceleration is enabled. 2D mode works everywhere.</p>
+          </div>
+        ) : (
+          <CanvasBoundary>
+            <Canvas
+              camera={{ position: [0, 2.2, 8.5], fov: FOV }}
+              dpr={[1, 1.75]}
+              gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+              onCreated={({ gl }) => {
+                gl.setClearColor("#efede8");
+              }}
+            >
+              <color attach="background" args={["#efede8"]} />
+              <CameraRig half={bounds.half} />
+              <FirstFrame onReady={() => setReady(true)} />
+              <hemisphereLight args={["#ffffff", "#c9c4bb", 0.9]} />
+              <directionalLight position={[5, 8, 6]} intensity={1.7} />
+              <directionalLight position={[-6, -2, -4]} intensity={0.5} />
+              <directionalLight position={[0, -5, 3]} intensity={0.35} />
+              <Molecule
+                scene={scene}
+                center={bounds.center}
+                timeRef={timeRef}
+                modeRef={modeRef}
+                speedRef={speedRef}
+                style={style}
+                spin={spin}
+                onEnd={() => setMode("paused")}
+              />
+              <OrbitControls enablePan={false} minDistance={3} maxDistance={Math.max(16, bounds.radius * 5)} />
+            </Canvas>
+          </CanvasBoundary>
+        )}
+        {!ready && webgl !== false && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-stage/80 text-stage-foreground" aria-live="polite">
+            <div className="flex items-center gap-3 rounded-full bg-background/85 px-4 py-2 text-sm text-foreground">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
+              Loading the 3D viewer…
+            </div>
+          </div>
+        )}
         <div className="pointer-events-none absolute left-3 top-3 max-w-[80%] rounded-full bg-background/85 px-3 py-1 text-xs font-medium text-foreground">
           {label} · frame {Math.round(frame) + 1}/{max + 1}
         </div>

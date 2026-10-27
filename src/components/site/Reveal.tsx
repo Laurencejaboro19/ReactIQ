@@ -1,18 +1,15 @@
-import { motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
+/**
+ * Fade-up on entry, done with a pure CSS animation so content is always visible
+ * (server-rendered, no JavaScript required) and never stuck at opacity 0.
+ */
 export function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
-  const reduced = useReducedMotion();
+  const style: CSSProperties = delay ? { animationDelay: `${delay}s` } : {};
   return (
-    <motion.div
-      className={className}
-      initial={reduced ? false : { opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <div className={`reveal ${className ?? ""}`} style={style}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
