@@ -248,7 +248,7 @@ function Molecule({
         const info = ELEMENT_INFO[a.el];
         return (
           <mesh key={k} ref={(m) => { atomRefs.current[k] = m; }} castShadow>
-            <sphereGeometry args={[style === "space" ? info.vdw : style === "sticks" ? bondR : info.r, 40, 40]} />
+            <sphereGeometry args={[style === "space" ? info.vdw : style === "sticks" ? bondR : info.r, 24, 18]} />
             <meshStandardMaterial color={info.color} roughness={0.25} metalness={0.05} />
           </mesh>
         );
@@ -261,7 +261,7 @@ function Molecule({
               (bondRefs.current[k] ??= [])[s] = m;
             }}
           >
-            <cylinderGeometry args={[1, 1, 1, 20]} />
+            <cylinderGeometry args={[1, 1, 1, 14]} />
             <meshStandardMaterial color={style === "sticks" ? "#8a8d91" : "#b8bcc2"} roughness={0.35} />
           </mesh>
         )),
@@ -282,6 +282,15 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
   const [webgl, setWebgl] = useState<boolean | null>(null);
   const [ready, setReady] = useState(false);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [onScreen, setOnScreen] = useState(true);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(!!e?.isIntersecting), { rootMargin: "120px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   const zoom = (factor: number) => {
     const c = controlsRef.current;
     if (!c) return;
@@ -324,7 +333,7 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border bg-stage sm:aspect-[16/9]">
+      <div ref={stageRef} className="relative aspect-[4/3] overflow-hidden rounded-2xl border bg-stage sm:aspect-[16/9]">
         {webgl === false ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-stage-foreground">
             <p className="font-semibold">This browser has WebGL turned off, so the 3D viewer can't run.</p>
@@ -334,7 +343,8 @@ export default function Molecule3D({ scene }: { scene: Scene3D }) {
           <CanvasBoundary>
             <Canvas
               camera={{ position: [0, 2.2, 8.5], fov: FOV }}
-              dpr={[1, 1.75]}
+              dpr={[1, 1.5]}
+              frameloop={onScreen ? "always" : "never"}
               gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
               onCreated={({ gl }) => {
                 gl.setClearColor("#efede8");

@@ -29,9 +29,25 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
   const dirRef = useRef(1);
   const posRef = useRef(0);
   posRef.current = pos;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+
+  // Only animate while on screen and the tab is in the foreground.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setVisible(!!e?.isIntersecting), { rootMargin: "80px" });
+    io.observe(el);
+    const onVis = () => setVisible(document.visibilityState === "visible" && !!el.isConnected);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || !visible) return;
     if (reduced) {
       const id = setInterval(() => {
         let p = Math.round(posRef.current) + dirRef.current;
@@ -46,10 +62,17 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
     }
     let raf = 0;
     let last = performance.now();
+    let lastPaint = 0;
     let hold = 0;
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
+      // ~30 fps is plenty for a mechanism and halves the work on phones
+      if (now - lastPaint < 32) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      lastPaint = now;
       if (hold > 0) {
         hold -= dt;
       } else {
@@ -71,7 +94,7 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, loop, n, reduced]);
+  }, [playing, loop, n, reduced, visible]);
 
   const idx = Math.min(Math.floor(pos), n - 1);
   const t = pos - idx;
@@ -113,7 +136,7 @@ export function MechanismPlayer2D({ scene, steps, compact = false, title, classN
   const step: Step = steps[shown - 1] ?? { title: "", text: "" };
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
+    <div ref={rootRef} className={cn("flex flex-col gap-3", className)}>
       <div className={cn("relative overflow-hidden rounded-2xl border bg-surface-2", compact ? "" : "aspect-[5/3]")}>
         <div className="glow-orb absolute -right-10 -top-10 h-40 w-40 opacity-60" />
         <svg

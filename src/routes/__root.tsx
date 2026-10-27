@@ -75,11 +75,15 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   );
 }
 
+// Classic-script (ES5) watchdog: if the app fails to start on an old or unusual
+// phone browser, show the real error instead of a silently dead page.
+const WATCHDOG = `(function(){var w=window;var shown=false;function show(msg){if(shown)return;shown=true;var d=document.createElement('div');d.setAttribute('role','alert');d.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#ff6405;color:#111;font:14px/1.4 system-ui,sans-serif;padding:12px 16px;text-align:center';d.innerHTML='ReactIQ could not start in this browser. <b>Tap to reload</b>, or open the link in Chrome or Safari.<br><span style="opacity:.75;font-size:12px">'+String(msg).replace(/</g,'&lt;').slice(0,160)+'</span>';d.onclick=function(){location.reload()};(document.body||document.documentElement).appendChild(d)}w.addEventListener('error',function(e){if(!w.__riqReady){show(e.message||'script error')}});w.addEventListener('unhandledrejection',function(e){if(!w.__riqReady){show((e.reason&&e.reason.message)||'load error')}});setTimeout(function(){if(!w.__riqReady){show('the app did not start within 15 seconds (slow network or unsupported browser)')}},15000)})();`;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "ReactIQ — Reaction mechanism, simplified." },
       { name: "description", content: "Learn reaction mechanisms in 2D, 3D and with an AI tutor." },
       { property: "og:type", content: "website" },
@@ -97,6 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" },
     ],
+    scripts: [{ children: WATCHDOG }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -111,6 +116,11 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="grain">
+        <noscript>
+          <div style={{ background: "#ff6405", color: "#111", padding: "10px 16px", fontSize: 14, textAlign: "center" }}>
+            ReactIQ needs JavaScript for the animations and the tutor. Please enable it, or open this page in Chrome or Safari.
+          </div>
+        </noscript>
         {children}
         <Scripts />
       </body>
@@ -120,6 +130,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    (window as Window & { __riqReady?: boolean }).__riqReady = true;
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

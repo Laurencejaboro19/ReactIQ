@@ -7,6 +7,13 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    build: {
+      // Phones in the wild run old browsers. Ship ES2018 so class fields, #private
+      // members, ??= and static blocks are transpiled instead of crashing the app.
+      target: "es2018",
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
